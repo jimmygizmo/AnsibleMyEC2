@@ -3,12 +3,14 @@
 
 ### Automate your EC2 instances with clean/simple Ansible:
 
-### Create, Setup, Deploy, Operate: Containerized Full Stack Apps
+### Create, Setup, Deploy, Operate: Containerized Full Stack Apps.
 
-### Perfect for teams to run a dev environment for containerized apps
+### Perfect for teams to run a dev environment for containerized apps.
 
 ### Academically straightforwad implementation of Ansible - Great for learning!
 ----
+
+## Overview
 
 Ansible running locally in a Python virtual environment, set up in the simplest and cleanest possible way to empower developers who use AWS EC2 instances for straightforward, containerized full stack deployments.
 
@@ -22,9 +24,11 @@ I'll keep this project simple. I have another project for a containerized Ansibl
 
 ----
 
+## Pyenv
+
 I enthusiastically promote the use of Pyenv for complete, flawless management of multiple Python versions and your perfectly-version-matched Python Virtual Environments.
 
-I've used them all and this is the best way. Having said that, you can easily adapt the related instructions to use your favorite Python environment strategy.
+I've used all strategies and this is the best way. Having said that, you can easily adapt the related instructions to use your favorite Python environment strategy.
 
 The project includes the Pyenv .python-version file for the virtual environment that will be named "ve.ansimy". (People with fancy git-enabled ZSH prompts like short VE names.)
 
@@ -56,11 +60,11 @@ TODO: Write these instructions properly. For now, here is the quick summary:
 
 Now at this point your Pyenv Virtual Environment will be automatically activated any time your shell session or the executing context is "inside" the project, anywhere underneath the parent .python-version file. See how that works? Absolutely elegant, isn't it. Pyenv is so great. (This is not a paid endorsement lol! It is open source!)
 
-You just you just type "python" and you get the correct Python.
+You just type "python" and you get the correct Python!
 
-You just type "pip" and you get the right Pip.
+You just type "pip" and you get the right Pip!
 
-No need to over-complicate things with stuff like "pip3" or "python3". Those days are past us IMHO.
+(No need to over-complicate things with stuff like "pip3" or "python3". Those days are past us IMHO.)
 
     pip install --upgrade pip
 
