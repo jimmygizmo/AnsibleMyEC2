@@ -1,5 +1,5 @@
 # requirements.txt
 
 ansible
-botbo3
+boto3
 

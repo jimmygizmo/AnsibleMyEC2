@@ -14,7 +14,7 @@
 
 Ansible running locally in a Python virtual environment, set up in the simplest and cleanest possible way to empower developers who use AWS EC2 instances for straightforward, containerized full stack deployments.
 
-I develop The Nucleus Stack, full stack starter kit and complete application stack with modular component/enhancement stacks.
+I develop The Nucleus Stack, a full stack starter kit and complete application stack with modular enhancement stacks like REST vs GraphQL backends and many more future stack module plans in areas like Big Data and ML.
 
 This is the Ansible set up I use to work with a handful of t2.micro to t2.medium instances to run different projects and different configurations of Nucleus and variants .. or anything at all I need to run.
 
