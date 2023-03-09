@@ -1,0 +1,36 @@
+---
+# play-new-ec2-micro.yml
+
+-
+  name: Play02 - AWS CLI - Create new EC2 t2.micro instance
+  hosts: localhost
+  tasks:
+    ########
+    - name: Block01 - AWS Info
+      block:
+      - name: Task-B01-T01 - Get info on all running instances
+        community.aws.ec2_instance_info:
+        register: out_ec2_instance_list
+      - name: Task-B01-T02 show Task-B01-T01
+        debug:
+          var: out_ec2_instance_list
+    ########
+    - name: Block02 - Create New EC2 Instance - t2.micro
+      block:
+        - name: Task-B02-T01 - Create the new EC2 instance -------- NEW t2.micro
+          amazon.aws.ec2_instance:
+            name: "ansiblemyec2"
+            vpc_subnet_id: XXXXXXXX_YOUR_SUBNET_ID_XXXXXXXX
+            instance_type: t2.micro
+            image_id: ami-0b029b1931b347543
+            metadata_options:
+              http_endpoint: enabled
+    ####
+
+...
+
+
+# https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_instance_module.html
+
+# Current, basic Amazon Linux OS Image (Red Hat derivative): image_id: ami-0b029b1931b347543
+

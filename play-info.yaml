@@ -1,0 +1,109 @@
+---
+# play-info.yml
+
+-
+  name: Play01 - EC2 fresh instance - Gather Information Before Setup
+  hosts: groupmain
+  tasks:
+    ####
+    - name: Task0101 - Date, Time -- date
+      command: date
+      register: out_date
+    - name: SHOW Task0101
+      debug:
+        var: out_date.stdout_lines
+    ####
+    - name: Task0102 - Locate env (we need env for portable shebangs) -- which env
+      command: which env
+      register: out_which_env
+    - name: SHOW Task0102
+      debug:
+        var: out_which_env.stdout_lines
+    ####
+    - name: Task0103 - Locate bash (we use bash for everything) -- which bash
+      command: which bash
+      register: out_which_bash
+    - name: SHOW Task0103
+      debug:
+        var: out_which_bash.stdout_lines
+    ####
+    - name: Task0104 - System and Kernel Info -- uname -a
+      command: uname -a
+      register: out_uname
+    - name: SHOW Task0104
+      debug:
+        var: out_uname.stdout_lines
+    ####
+    - name: Task0105 - Proc Version -- cat /proc/version
+      command: cat /proc/version
+      register: out_version
+    - name: SHOW Task0105
+      debug:
+        var: out_version.stdout_lines
+    ####
+    - name: Task0106 - Process Table -- ps aux
+      command: ps aux
+      register: out_ps
+    - name: SHOW Task0106
+      debug:
+        var: out_ps.stdout_lines
+    ####
+    - name: Task0107 - Memory Stats -- vmstat
+      command: vmstat
+      register: out_vmstat
+    - name: SHOW Task0107
+      debug:
+        var: out_vmstat.stdout_lines
+    ####
+    - name: Task0108 - IO Stats -- iostat
+      command: iostat
+      register: out_iostat
+    - name: SHOW Task0108
+      debug:
+        var: out_iostat.stdout_lines
+    ####
+    - name: Task0109 - PATH -- echo "$PATH"
+      command: echo "$PATH"
+      register: out_path
+    - name: SHOW Task0109
+      debug:
+        var: out_path.stdout_lines
+    ####
+    - name: Task0110 - List Block Devices -- lsblk
+      command: lsblk
+      register: out_lsblk
+    - name: SHOW Task0110
+      debug:
+        var: out_slblk.stdout_lines
+    ####
+    - name: Task0111 - Disk Freespace -- df -h
+      command: df -h
+      register: out_df
+    - name: SHOW Task0111
+      debug:
+        var: out_df.stdout_lines
+    ####
+    - name: Task0112 - List Filesystem Mount Points -- mount
+      command: mount
+      register: out_mount
+    - name: SHOW Task0112
+      debug:
+        var: out_mount.stdout_lines
+    ####
+    - name: Task0113 - List All System Limits - (file descriptors, stack size, etc.) (VIA ansible.builtin.shell) -- ulimit -a
+      ansible.builtin.shell:
+        cmd: ulimit -a
+      register: out_ulimit
+    - name: SHOW Task0113
+      debug:
+        var: out_ulimit.stdout_lines
+    ####
+    - name: Task0114 - Environment Variables -- env
+      command: env
+      register: out_env
+    - name: SHOW Task0114
+      debug:
+        var: out_env.stdout_lines
+    ####
+
+...
