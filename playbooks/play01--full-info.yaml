@@ -1,107 +1,110 @@
 ---
-# play-info.yml
+# play01--full-info.yaml
 
 -
   name: Play01 - EC2 fresh instance - Gather Information Before Setup
-  hosts: groupmain
+#  vars:
+#    hosts: groupmain
+  # Usage: Pass a valid host or a group on the command line via the argument 'hosts'.
+  hosts: "{{ hosts }}"
   tasks:
     ####
-    - name: Task0101 - Date, Time -- date
+    - name: T01 - Date, Time -- date
       command: date
       register: out_date
-    - name: SHOW Task0101
+    - name: T01-out
       debug:
         var: out_date.stdout_lines
     ####
-    - name: Task0102 - Locate env (we need env for portable shebangs) -- which env
+    - name: T02 - Locate env (we need env for portable shebangs) -- which env
       command: which env
       register: out_which_env
-    - name: SHOW Task0102
+    - name: T02-out
       debug:
         var: out_which_env.stdout_lines
     ####
-    - name: Task0103 - Locate bash (we use bash for everything) -- which bash
+    - name: T03 - Locate bash (we use bash for everything) -- which bash
       command: which bash
       register: out_which_bash
-    - name: SHOW Task0103
+    - name: T03-out
       debug:
         var: out_which_bash.stdout_lines
     ####
-    - name: Task0104 - System and Kernel Info -- uname -a
+    - name: T04 - System and Kernel Info -- uname -a
       command: uname -a
       register: out_uname
-    - name: SHOW Task0104
+    - name: T04-out
       debug:
         var: out_uname.stdout_lines
     ####
-    - name: Task0105 - Proc Version -- cat /proc/version
+    - name: T05 - Proc Version -- cat /proc/version
       command: cat /proc/version
       register: out_version
-    - name: SHOW Task0105
+    - name: T05-out
       debug:
         var: out_version.stdout_lines
     ####
-    - name: Task0106 - Process Table -- ps aux
+    - name: T06 - Process Table -- ps aux
       command: ps aux
       register: out_ps
-    - name: SHOW Task0106
+    - name: T06-out
       debug:
         var: out_ps.stdout_lines
     ####
-    - name: Task0107 - Memory Stats -- vmstat
+    - name: T07 - Memory Stats -- vmstat
       command: vmstat
       register: out_vmstat
-    - name: SHOW Task0107
+    - name: T07-out
       debug:
         var: out_vmstat.stdout_lines
     ####
-    - name: Task0108 - IO Stats -- iostat
+    - name: T08 - IO Stats -- iostat
       command: iostat
       register: out_iostat
-    - name: SHOW Task0108
+    - name: T08-out
       debug:
         var: out_iostat.stdout_lines
     ####
-    - name: Task0109 - PATH -- echo "$PATH"
+    - name: T09 - PATH -- echo "$PATH"
       command: echo "$PATH"
       register: out_path
-    - name: SHOW Task0109
+    - name: T09-out
       debug:
         var: out_path.stdout_lines
     ####
-    - name: Task0110 - List Block Devices -- lsblk
+    - name: T10 - List Block Devices -- lsblk
       command: lsblk
       register: out_lsblk
-    - name: SHOW Task0110
+    - name: T10-out
       debug:
-        var: out_slblk.stdout_lines
+        var: out_lsblk.stdout_lines
     ####
-    - name: Task0111 - Disk Freespace -- df -h
+    - name: T11 - Disk Freespace -- df -h
       command: df -h
       register: out_df
-    - name: SHOW Task0111
+    - name: T11-out
       debug:
         var: out_df.stdout_lines
     ####
-    - name: Task0112 - List Filesystem Mount Points -- mount
+    - name: T12 - List Filesystem Mount Points -- mount
       command: mount
       register: out_mount
-    - name: SHOW Task0112
+    - name: T12-out
       debug:
         var: out_mount.stdout_lines
     ####
-    - name: Task0113 - List All System Limits - (file descriptors, stack size, etc.) (VIA ansible.builtin.shell) -- ulimit -a
+    - name: T13 - List All System Limits - (file descriptors, stack size, etc.) (VIA ansible.builtin.shell) -- ulimit -a
       ansible.builtin.shell:
         cmd: ulimit -a
       register: out_ulimit
-    - name: SHOW Task0113
+    - name: T13-out
       debug:
         var: out_ulimit.stdout_lines
     ####
-    - name: Task0114 - Environment Variables -- env
+    - name: T14 - Environment Variables -- env
       command: env
       register: out_env
-    - name: SHOW Task0114
+    - name: T14-out
       debug:
         var: out_env.stdout_lines
     ####

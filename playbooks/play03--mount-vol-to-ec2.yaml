@@ -1,0 +1,31 @@
+---
+# play03--mount-vol-to-ec2.yaml
+
+# The EC2 instance and the attached volume must already exist and the EC2 must be a valid
+# managed node which has the Ansible public key authorized. This playbook to mount the
+# attached volume may then be run after those pre-requisites are in place. This script will
+# directly target the new EC2 host. This is different from how the new EC2 instance was just created
+# which was done using the local AWS CLI, and Ansible targeting that CLI on localhost. You
+# must have already authorized the local public ssh key on that new host, then we can run this
+# playbook, using the standard ssh connection method to automate against it.
+
+# CURRENTLY NO KNOWN MOUNTING RECIPE OR MODULE WORKS. CUSTOM SOLUTION IS BEING DEVELOPED. THE MANUAL
+# STEPS WHICH WORK FOR MOUNTING THE NEW PERSISTENT VOLUME ARE DETAILED AT THE END OF THIS FILE.
+
+- name: Play03 - AWS CLI - Mount the attached persistent volume of a new EC2 instance
+  vars:
+    hosts_new_ec2_instance_for_mounting_vol: fresh-new-inst-01
+  hosts: "{{ hosts_new_ec2_instance_for_mounting_vol }}"
+  tasks:
+    - amazon.aws.ec2_vol_info:
+#        filters:
+#          "tag:Name": "some-data"
+      register: ec2_vol_info
+    - name: DEBUG-out
+      debug:
+        var: ec2_vol_info.stdout_lines
+
+
+# TODO: Add the promised manual steps to mount an attached persistent volume to its EC2 instance.
+# The working steps are known and proven. We just need to finish automating them one way or another.
+

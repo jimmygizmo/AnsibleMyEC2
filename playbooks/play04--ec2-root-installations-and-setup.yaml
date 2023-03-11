@@ -1,0 +1,75 @@
+---
+# play04--ec2-root-installations-and-setup.yaml
+
+# All commands in this playbook must be run as root. All commands have sudo added before them.
+# In my opinion, using sudo like this is more straightforward, predictable and makes for a cleaner playbook.
+# Using Ansible 'become' involves unnecessary complexity and clutters the playbook unnecessarily, IMHO.
+
+
+- name: Play04 - New EC2 Instance - Root Installations and Setup
+  vars:
+    hosts_new_ec2_instance_for_installs: TODO--ABSTRACT-THE-VARIABLE-HERE-AND-MAKE-THE-RUN-SCRIPT-FOR-THIS-PLAYBOOK
+  hosts: "{{ hosts_new_ec2_instance_for_installs }}"
+  tasks:
+    ########
+    - name: Block01 - AWS Info
+      block:
+        ####
+        - name: B01T01 - Update Yum Package Manager -- yum update -y
+          command: sudo yum update -y
+          register: out_yum_update
+        - name: B01T01-out
+          debug:
+            var: out_yum_update.stdout_lines
+        ####
+        - name: B01T02 - Enable Install Docker -- amazon-linux-extras enable docker
+          command: sudo amazon-linux-extras enable docker
+          register: out_enable_docker
+        - name: B01T02-out
+          debug:
+            var: out_enable_docker.stdout_lines
+        ####
+        - name: B01T03 - Install Docker with Yum -- yum install -y docker
+          command: sudo yum install -y docker
+          register: out_install_docker
+        - name: B01T03-out
+          debug:
+            var: out_install_docker.stdout_lines
+        ####
+        - name: B01T04 - Add App User to Docker Group -- usermod -a -G docker ec2-user
+          command: sudo usermod -a -G docker ec2-user
+          register: out_usermod
+        - name: B01T04-out
+          debug:
+            var: out_usermod.stdout_lines
+        ####
+        - name: B01T05 - Start Docker Service -- service docker start
+          command: sudo service docker start
+          register: out_docker_start
+        - name: B01T05-out
+          debug:
+            var: out_docker_start.stdout_lines
+        ####
+        - name: B01T06 - Sleep 10 while Docker Service Starts -- sleep 10
+          command: sudo sleep 10
+          register: out_sleep
+        - name: B01T06-out
+          debug:
+            var: out_sleep.stdout_lines
+        ####
+        - name: B01T07 - Service Status of Docker -- service docker status
+          command: sudo service docker status
+          register: out_docker_status
+        - name: B01T07-out
+          debug:
+            var: out_docker_status.stdout_lines
+        ####
+        - name: B01T08 - Docker Info -- docker info
+          command: sudo service docker status
+          register: out_docker_info
+        - name: B01T08-out
+          debug:
+            var: out_docker_info.stdout_lines
+        ####
+    ########
+
