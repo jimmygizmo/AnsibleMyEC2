@@ -4,8 +4,11 @@
 
 # Prior to this:
 # Install the latest Python into your Pyenv: pyenv install 3.11.2
-# pyenv virtualenv 3.11.2 ve.ansible
-# Also, create .python-version in project root, containing: ve.ansible
+# pyenv virtualenv 3.11.2 ve.ansimy
+# NOTE: The .python-version included in the project contains: ve.ansimy
+# This is how Pyenv automatically activates the correct VE, for any
+# location in any subdirectory underneath a .python-version file.
+# How marvelous is that! lol. The wonders of Pyenv abound.
 
 pip install --upgrade pip
 pip install --upgrade setuptools
