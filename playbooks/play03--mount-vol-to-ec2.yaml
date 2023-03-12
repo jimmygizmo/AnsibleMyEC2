@@ -7,25 +7,130 @@
 # directly target the new EC2 host. This is different from how the new EC2 instance was just created
 # which was done using the local AWS CLI, and Ansible targeting that CLI on localhost. You
 # must have already authorized the local public ssh key on that new host, then we can run this
-# playbook, using the standard ssh connection method to automate against it.
+# playbook, using the standard ssh connection method to automate against it. THE MANUAL
+# STEPS WHICH WORK FOR MOUNTING THE NEW PERSISTENT VOLUME ARE DETAILED IN THE FILE:
+# /playbooks/todo--play03--mount-vol-to-ec2.txt
 
-# CURRENTLY NO KNOWN MOUNTING RECIPE OR MODULE WORKS. CUSTOM SOLUTION IS BEING DEVELOPED. THE MANUAL
-# STEPS WHICH WORK FOR MOUNTING THE NEW PERSISTENT VOLUME ARE DETAILED AT THE END OF THIS FILE.
 
-- name: Play03 - AWS CLI - Mount the attached persistent volume of a new EC2 instance
-  vars:
-    hosts_new_ec2_instance_for_mounting_vol: fresh-new-inst-01
-  hosts: "{{ hosts_new_ec2_instance_for_mounting_vol }}"
+- name: Play03 - AWS CLI - Format and Mount the attached persistent volume of a new EC2 instance
+#  vars:
+#    format_mount_vol_host: fresh-new-inst-AA
+  hosts: "{{ format_mount_vol_host }}"
   tasks:
-    - amazon.aws.ec2_vol_info:
-#        filters:
-#          "tag:Name": "some-data"
-      register: ec2_vol_info
-    - name: DEBUG-out
+    ####
+    - name: T01 - sudo file -s /dev/sdb
+      command: sudo file -s /dev/sdb
+      register: out_device_path_check_first
+    - name: T01-out
       debug:
-        var: ec2_vol_info.stdout_lines
+        var: out_device_path_check_first.stdout_lines
+    ####
+    - name: T02 - sudo file -s /dev/xvdb
+      command: sudo file -s /dev/xvdb
+      register: out_device_path_check_second
+    - name: T02-out
+      debug:
+        var: out_device_path_check_second.stdout_lines
+    ####
+    - name: T03 - sudo file -s /dev/xvdb
+      command: sudo file -s /dev/xvdb
+      register: out_device_path_check_second
+    - name: T03-out
+      debug:
+        var: out_device_path_check_second.stdout_lines
+    ####
+    - name: T04 - Confirm no filesystem with sudo lsblk -f
+      command: sudo lsblk -f
+      register: out_lsblk_f
+    - name: T04-out
+      debug:
+        var: out_lsblk_f.stdout_lines
+    ####
+#    - name: T0XX - RESERVED SPOT - possibly parse UUID here via lsblk -f
+#      command: sudo lsblk -f
+#      register: out_lsblk_f_parse
+#    - name: T0XX-out
+#      debug:
+#        var: out_lsblk_f_parse.stdout_lines
+    ####
+    - name: T05 - FORMAT - Format the volume - sudo mkfs -t xfs /dev/xvdb
+      command: sudo mkfs -t xfs /dev/xvdb
+      register: out_format
+    - name: T05-out
+      debug:
+        var: out_format.stdout_lines
+    ####
+    - name: T06 - Create the mount point directory - sudo mkdir /data
+      command: sudo mkdir /data
+      register: out_create_mount_dir
+    - name: T06-out
+      debug:
+        var: out_create_mount_dir.stdout_lines
+    ####
+    - name: T07 - MOUNT - Mount the volume - sudo mount /dev/xvdb /data
+      command: sudo mount /dev/xvdb /data
+      register: out_mount
+    - name: T07-out
+      debug:
+        var: out_mount.stdout_lines
+    ####
+    - name: T08 - Show results via df - df -h
+      command: df -h
+      register: out_df
+    - name: T08-out
+      debug:
+        var: out_df.stdout_lines
+    ####
+    - name: T09 - Backup fstab prior to mods for auto-remount
+      command: sudo cp /etc/fstab /etc/fstab.orig
+      register: out_backup_fstab
+    - name: T09-out
+      debug:
+        var: out_backup_fstab.stdout_lines
+    ####
+    - name: T10 - Inspect fstab prior to modification
+      command: cat /etc/fstab.orig
+      register: out_cat_fstab
+    - name: T10-out
+      debug:
+        var: out_cat_fstab.stdout_lines
+    ####
+    - name: T11 - Inspect Block IDs - * UNDER DEVELOPMENT - WE NEED TO PARSE THIS *
+      command: sudo blkid
+      register: out_inspect_blkid
+    - name: T11-out
+      debug:
+        var: out_inspect_blkid.stdout_lines
+    ####
 
 
-# TODO: Add the promised manual steps to mount an attached persistent volume to its EC2 instance.
-# The working steps are known and proven. We just need to finish automating them one way or another.
+#This is the file I make by adding the last line
+#
+
+#I made backups of the original and also made 2 extra backup files with the new
+#entry, one with it active and one with it commented out.
+#[ec2-user@ip-172-31-8-87 ~]$ sudo cp /etc/fstab /etc/fstab.newvol-prepped-but-disabled
+#[ec2-user@ip-172-31-8-87 ~]$ sudo vim /etc/fstab
+#[ec2-user@ip-172-31-8-87 ~]$ sudo cp /etc/fstab /etc/fstab.newvol-prepped-but-disabled
+#[ec2-user@ip-172-31-8-87 ~]$ sudo vim /etc/fstab
+#[ec2-user@ip-172-31-8-87 ~]$ sudo cp /etc/fstab /etc/fstab.datavol-active-backup
+#
+#This is the /etc/fstab to use normally:
+#--------
+##
+#UUID=1377e573-627c-46ee-b7ca-9b86138b39db     /           xfs    defaults,noatime  1   1
+#UUID=5a189975-cd19-43e8-b5ff-6f3bef05ccc5     /data           xfs    defaults,nofail  0   2
+#--------
+#
+#OPTIONS EXPLAINED:
+#nofail means the instance will be allowed to boot even if the vol can't mount.
+#2 means it is not the root vol.
+#0 prevents the filesystem from being dumped (? TODO: Clarify what this means??)
+
+
+# NEED TO PARSE SOMETHING LIKE THIS FOR THE UUID FOR FSTAB
+# /dev/xvda1: LABEL="/" UUID="1377e573-627c-46ee-b7ca-9b86138b39db" TYPE="xfs" PARTLABEL="Linux" PARTUUID="9a2c3f9e-8213-4d6a-8591-a0bc2666b3f9"
+# /dev/xvdb: UUID="5a189975-cd19-43e8-b5ff-6f3bef05ccc5" TYPE="xfs"
+
+# lsblk -o PATH,SERIAL | grep {{ new_ec2_volume_id_modded }} | cut -d' ' -f1
 
