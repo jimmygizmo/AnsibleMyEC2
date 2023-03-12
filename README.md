@@ -8,6 +8,7 @@
 ### Perfect for teams to run a dev environment for containerized apps.
 
 ### Academically straightforwad implementation of Ansible - Great for learning!
+
 ----
 
 ## Overview
@@ -77,11 +78,83 @@ You just type "pip" and you get the right Pip!
 
 ----
 
-That is pretty much it for project and environment setup. There are now some steps to configure keys here in the project and on each of your EC2 hosts you want to manage. Super simple classic SSH stuff with id_rsa.pub, authorized_keys etc. We'll simply add the pub key from the local project side to the authorized_keys of each managed node and then configure the host addresses and username (ec2-user probably) for all your targets and then we can start running playbooks. Oh! Let's not forget about the AWS CLI credentials.
 
-TODO: Continue the missing instructions here. We're almost there!
+## Configuring Authentication for SSH and AWS CLI
+
+
+### How to configure the all-important ssh  key
+
+You will either be using the private key (.pem file) from your AWS account's main key pair or another AWS key pair
+in your AWS account which you specify when creating resources like EC2 instances, OR .. you will be using a local
+public key which you generated yourself.
+
+In this second case, such local keys will have to have been installed on
+each managed node manually. Only AWS account keys, usually your main/default key, can be automatically installed on a
+potential managed node EC2 instance ahead of time (at the time of instance creation); hence why it is the
+preferred method. See below for details.
+
 
 ----
 
+
+### A. Preferred Key Strategy - AWS Main Key Pair - Private Key (.pem file)
+
+The below path for 'ansible_ssh_private_key_file' shows an example placeholder key, illustrating how to use the
+secrets directory in this project. The /secrets/ directory prevents all contents from being added to a git
+repository, thanks to the project .gitignore file.
+
+A private key from your AWS account, possibly your main private key (.pem file) from your main AWS account Key Pair,
+is a preferred key to use, because when you create resources like EC2 instances, only a private key from your
+AWS account can be assigned to work out of the box for Ansible authentication. Any other key will require
+additional manual steps. This is the simplest scenario to enable authentication to new managed nodes.
+
+#### *Notice that the variable name is unique to this strategy:* (ansible_ssh_private_key_file)
+
+     ansible_ssh_private_key_file = secrets/aws_account_main_key_pair_private_key.pem
+
+
+----
+
+
+### Alternate Key Strategy - Locally-Generated, Manually-Installed Public Key (.pub file)
+
+The below path for 'private_key_file' shows an example placeholder key, illustrating how to use the secrets
+directory in this project. The /secrets/ directory will prevent all contents from being added to a git repository,
+thanks to the project .gitignore file.
+This might be the public key you generated yourself locally, using the ssk-keygen command. In this scenario, you
+would copy this locally-generated public key from it's default location at ~/.ssh/id_rsa.pub (or similar) to a
+descriptive pathname, living inside the /secrets/ directory.
+
+NOTE: This key will work on your EC2 hosts exactly like the default AWS account key pair private key. HOWEVER, you
+will have to ssh into the host manually (or use some other automation) and ADD this locally-generated key to
+the EC2's ec2-user authorized_keys file, usually located at ~/.ssh/authorized_keys
+
+#### *Notice that the variable name is different for this approach and the variation below:* (private_key_file)
+
+     private_key_file = secrets/ssh_local_pub_key_authorized_on_managed_nodes.pub
+
+----
+
+
+#### Variation of the Alternate (local) Key Strategy
+
+This is the same as the above strategy, just without copying the key to /secrets/ with a descriptive name.
+If you also authorized your local default pub key on your managed hosts, this should work for most people on
+a macOS or Linux workstation or control node, under the relevant user account:
+
+     private_key_file = ~/.ssh/id_rsa.pub
+
+----
+
+## AWS CLI Authentication
+
+Some of the playbooks in this project do not operate on managed nodes over SSH, but rather they operate on
+the local (control node) installed and configured AWS CLI. An example is for the creation of an EC2
+instance, which will be a new managed node.
+
+All that is required for AnsibleMyEC2 to use your local AWS CLI is that you yourself can use it locally and
+that is has been congiured as such and is working to connect to and authenticate with your AWS account.
+
+----
 
 

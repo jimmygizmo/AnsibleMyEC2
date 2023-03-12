@@ -9,6 +9,7 @@
   vars:
 #    new_instance_name: YOUR-DEFAULT-NEW-INSTANCE-NAME--OPTIONAL
 #    new_instance_subnet_id: YOUR-DEFAULT-SUBNET-ID--OPTIONAL
+#    new_instance_key_name: YOUR-DEFAULT-KEY-NAME--OPTIONAL
     new_instance_ami_image: ami-0b029b1931b347543
   hosts: localhost
   tasks:
@@ -29,13 +30,14 @@
             name: "{{ new_instance_name }}"
             vpc_subnet_id: "{{ new_instance_subnet_id }}"
             instance_type: t2.micro
+            key_name: "{{ new_instance_key_name }}"
             image_id: "{{ new_instance_ami_image }}"
             metadata_options:
               http_endpoint: enabled
             volumes:
               - device_name: /dev/sdb
                 ebs:
-                  volume_size: 30
+                  volume_size: 12
                   delete_on_termination: false
           register: out_ec2_new_instance
         - name: B02T01-out
@@ -50,8 +52,7 @@
     ####
         # Because the volume is still in the process of attaching, we need to pause and then query for fresh instance
         # info, which is why we just obtained the instance id. Then we can parse out the volume serial number,
-        # which might help us mount the attached persistent volume.
-        # TODO: Update here when mounting solution is complete.
+        # which might help us mount the attached persistent volume. # TODO: Update here when solution is complete.
         - name: B02T03 - Sleep for 10 seconds to let the new volume attach, then continue with play
           ansible.builtin.wait_for:
             timeout: 10
@@ -73,18 +74,6 @@
           #register: new_ec2_volume_id_modded
         - debug:
             msg: "* * * * * * * * set_fact: new_ec2_volume_id_modded - NEW EC2 VOLUME ID (modded): {{ new_ec2_volume_id_modded }}"
-#        - name: B02T06 - List Linux block devices - lsblk - grep - cut f1 - Obtain rough info
-          # HARD FAILURE: The current EC2 and AMI Linux do not have lsblk commmand or output compatible with this strategy.
-          # The available lsblk does not seem to recognize the column PATH, and might use MOUNTPOINT, but MOUNTPOINT
-          # is always blank on this OS. Multiple issues here at this time.
-          # Current strategy to automatically mounting the volume we just created stops here for now.
-          # DISABLING BY COMMENTING OUT HERE. CONTINUE SOLUTION HERE WITH DIFFERENT USE OF lsblk OR DIFFERENT STRATEGY.
-#          ansible.builtin.shell:
-#            cmd: "lsblk -o PATH,SERIAL | grep {{ new_ec2_volume_id_modded }} | cut -d' ' -f1"
-#          register: out_lsblk_grep_cut
-#        - debug:
-#            msg: "* * * * * * * * out_lsblk_grep_cut RAW OUTPUT: {{ out_lsblk_grep_cut }}"
-
 
 ...
 
