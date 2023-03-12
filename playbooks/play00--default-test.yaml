@@ -1,0 +1,16 @@
+---
+# play00--default.yaml
+
+-
+  name: Play00 - Default playbook - Placeholder or test
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    ####
+  - name: T01 - Output a test message
+    debug:
+      msg: The default playbook just ran. This is a placeholder task. No actions were performed.
+    ####
+
+...
+
