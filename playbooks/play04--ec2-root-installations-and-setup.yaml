@@ -5,14 +5,15 @@
 # In my opinion, using sudo like this is more straightforward, predictable and makes for a cleaner playbook.
 # Using Ansible 'become' involves unnecessary complexity and clutters the playbook unnecessarily, IMHO.
 
+# TODO: Break the single Block into 2 maybe.
 
 - name: Play04 - New EC2 Instance - Root Installations and Setup
-  vars:
-    hosts_new_ec2_instance_for_installs: TODO--ABSTRACT-THE-VARIABLE-HERE-AND-MAKE-THE-RUN-SCRIPT-FOR-THIS-PLAYBOOK
-  hosts: "{{ hosts_new_ec2_instance_for_installs }}"
+#  vars:
+#    instance_for_installs: new-instance-a
+  hosts: "{{ instance_for_installs }}"
   tasks:
     ########
-    - name: Block01 - AWS Info
+    - name: Block01 - Installs, Setup
       block:
         ####
         - name: B01T01 - Update Yum Package Manager -- yum update -y
@@ -50,8 +51,8 @@
           debug:
             var: out_docker_start.stdout_lines
         ####
-        - name: B01T06 - Sleep 10 while Docker Service Starts -- sleep 10
-          command: sudo sleep 10
+        - name: B01T06 - Sleep 8 seconds while Docker Service Starts -- sleep 8
+          command: sudo sleep 8
           register: out_sleep
         - name: B01T06-out
           debug:
@@ -65,7 +66,7 @@
             var: out_docker_status.stdout_lines
         ####
         - name: B01T08 - Docker Info -- docker info
-          command: sudo service docker status
+          command: sudo service docker info
           register: out_docker_info
         - name: B01T08-out
           debug:

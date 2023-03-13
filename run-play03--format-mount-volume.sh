@@ -7,7 +7,7 @@ echo "TODO: The final piece of automation for this goal will edit the fstab file
 echo "For the time being, if the instance is stopped and restarted, you will need to DO: sudo mount /dev/xvdb /data"
 echo "TODO: In the interim, while the fstab solution in in the works, I will provide a simple Ansible remount play."
 echo "For the required manual steps are in the following file:"
-echo "**** See: playbooks/todo--play03--mount-vol-to-ec2.txt"
+echo "**** See: playbooks/todo--play03--format-mount-volume.txt"
 
 echo
 echo "Enter the host value for the managed node for which to format and mount the new attached volume."
@@ -15,7 +15,7 @@ echo "Enter 'format_mount_vol_host' value: "
 read -r format_mount_vol_host
 
 
-ansible-playbook -i inventory.yaml playbooks/play03--mount-vol-to-ec2.yaml \
+ansible-playbook -i inventory.yaml playbooks/play03--format-mount-volume.yaml \
   --extra-vars="format_mount_vol_host=$format_mount_vol_host"
 
 

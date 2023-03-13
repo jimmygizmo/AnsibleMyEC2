@@ -1,0 +1,230 @@
+# THESE ARE NOTES WITH COMMANDS AND OUTPUT - DO NOT RUN THIS AS A SCRIPT.
+# THESE STEPS ARE -GOOD- AND PROVEN AT LEAST 3 TIMES ON EC2 DEPLOYMENTS.
+
+STARTING FROM HERE TO CONTINUE AUTOMATION IN ONE OR TWO MORE PLAYBOOKS:
+THESE TWO STEPS ARE THE LAST TWO ADDED TO:
+playbooks/play03--format-mount-volume.yaml
+
+
+* * * * * * STANDARDIZED MOUNT POINT:
+/data
+* Create directory to mount /dev/xvdb to.
+sudo mkdir /data
+
+
+* * * * * * MOUNT:
+sudo mount /dev/xvdb /data
+
+*************************************** CONTINUE AUTMATION WORK FROM HERE ********************************************
+IN: playbooks/play03--format-mount-volume.yaml
+** MAYBE SPLIT IT INTO TWO PLAYBOOKS
+
+TODO: MAKE A PLAYBOOK FOR SIMPLE REMOUNTING UNTIL WE GET THIS FSTAB AUTO-REMOUNTING SETUP AUTOMATED.
+
+HERE ARE THE PREVIOUS STEPS LOGGED:
+[ec2-user@ip-172-31-8-87 ~]$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        2.0G     0  2.0G   0% /dev
+tmpfs           2.0G     0  2.0G   0% /dev/shm
+tmpfs           2.0G  444K  2.0G   1% /run
+tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
+/dev/xvda1       30G  2.1G   28G   7% /
+tmpfs           393M     0  393M   0% /run/user/1000
+[ec2-user@ip-172-31-8-87 ~]$
+[ec2-user@ip-172-31-8-87 ~]$ sudo mkdir /data
+[ec2-user@ip-172-31-8-87 ~]$
+[ec2-user@ip-172-31-8-87 ~]$ sudo mount /dev/xvdb /data
+[ec2-user@ip-172-31-8-87 ~]$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        2.0G     0  2.0G   0% /dev
+tmpfs           2.0G     0  2.0G   0% /dev/shm
+tmpfs           2.0G  444K  2.0G   1% /run
+tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
+/dev/xvda1       30G  2.1G   28G   7% /
+tmpfs           393M     0  393M   0% /run/user/1000
+/dev/xvdb        30G  247M   30G   1% /data
+
+
+* * * * * * ENSURE REMOUNTING AFTER EVERY REBOOT:
+Add entry to /etc/fstab, but first make a backup:
+sudo cp /etc/fstab /etc/fstab.orig
+
+
+[ec2-user@ip-172-31-8-87 ~]$ sudo cp /etc/fstab /etc/fstab.orig
+[ec2-user@ip-172-31-8-87 ~]$ cat /etc/fstab.orig
+#
+UUID=1377e573-627c-46ee-b7ca-9b86138b39db     /           xfs    defaults,noatime  1   1
+
+
+Now we need the new UUID:
+Use the blkid command to find the UUID of the device. Make a note of the UUID of the
+device that you want to mount after reboot. You'll need it in the following step.
+
+
+(Diff commands on Ubuntu vs RH/other variants)
+[ec2-user@ip-172-31-8-87 ~]$ sudo blkid
+/dev/xvda1: LABEL="/" UUID="1377e573-627c-46ee-b7ca-9b86138b39db" TYPE="xfs" PARTLABEL="Linux" PARTUUID="9a2c3f9e-8213-4d6a-8591-a0bc2666b3f9"
+/dev/xvdb: UUID="5a189975-cd19-43e8-b5ff-6f3bef05ccc5" TYPE="xfs"
+
+
+* * * * * * ADD THE ENTRY WITH THE CORRECT UUID TO /etc/fstab
+sudo vim /etc/fstab
+
+This is the file I make by adding the last line
+
+
+I made backups of the original and also made 2 extra backup files with the new
+entry, one with it active and one with it commented out.
+[ec2-user@ip-172-31-8-87 ~]$ sudo cp /etc/fstab /etc/fstab.newvol-prepped-but-disabled
+[ec2-user@ip-172-31-8-87 ~]$ sudo vim /etc/fstab
+[ec2-user@ip-172-31-8-87 ~]$ sudo cp /etc/fstab /etc/fstab.newvol-prepped-but-disabled
+[ec2-user@ip-172-31-8-87 ~]$ sudo vim /etc/fstab
+[ec2-user@ip-172-31-8-87 ~]$ sudo cp /etc/fstab /etc/fstab.datavol-active-backup
+
+This is the /etc/fstab to use normally:
+--------
+#
+UUID=1377e573-627c-46ee-b7ca-9b86138b39db     /           xfs    defaults,noatime  1   1
+UUID=5a189975-cd19-43e8-b5ff-6f3bef05ccc5     /data           xfs    defaults,nofail  0   2
+--------
+
+OPTIONS EXPLAINED:
+nofail means the instance will be allowed to boot even if the vol can't mount.
+2 means it is not the root vol.
+0 prevents the filesystem from being dumped (? TODO: Clarify what this means??)
+
+====================================================================================
+====================================================================================
+
+Above here we complete setup of the /data volume.
+Now we do an ssh-keygen in case we need a public key later.
+
+* * * * * * SSH-KEYGEN FOR FUTURE POSSIBLE USE:
+ssh-keygen -t rsa -q -N ""
+
+[ec2-user ~]$ ssh-keygen -t rsa -q -N ""
+Enter file in which to save the key (/home/ec2-user/.ssh/id_rsa):
+
+* TODO The ssh-keygen could possibly be made promptless using -f for file loc.
+
+====================================================================================
+====================================================================================
+
+* * * * * * AWS CONFIGURE * * * * * *
+
+[ec2-user ~]$ aws configure
+AWS Access Key ID [None]: ********************
+AWS Secret Access Key [None]: *****************************************
+Default region name [None]: us-west-2
+Default output format [None]:
+
+For output format, just pressed enter (None).
+
+* * * * * * * PERFORM aws ec2 describe-volumes TO PROVE AWS CONFIGURE AUTH WORKS * * * * *
+
+[ec2-user ~]$
+[ec2-user ~]$ aws ec2 describe-volumes
+{
+    "Volumes": [
+.. truncated by me .. it does work.
+    ]
+}
+[ec2-user ~]$
+
+* * * * * * TEST AWS GET LOGIN - FOR REPO USAGE * * * * * *
+
+aws ecr get-login --no-include-email --region us-west-2
+* UPDATE: I actually have scripts which get the password and include it in the pull
+  command, so this has evolved a little. See Nucleus Stack.
+
+* We will keep using the old AWS CLI version for now. I might have tried upgrading it
+ and ran into issues. I think BotFolk repo has notes on this.
+ Whatever we do currently on BF, we will do on SM.
+
+
+====================================================================================
+====================================================================================
+
+* * * * * * DOCKER COMPOSE * * * * * *
+
+Latest version on GitHub currenty 2.14.2
+WE WILL DO THE CLASSIC "STANDALONE" INSTALL, NOT THE NEW PLUGIN.
+(Because BotFolk.ai works great and so we are not changing anything unless
+part of the new technology stack plan. We can experiment in peripheral/support areas
+later when dev time is less-scarce.)
+
+
+LATEST COMMAND TO USE:
+curl -SL https://github.com/docker/compose/releases/download/v2.14.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+COMMANDS I USED ON BOTFOLK (approximate, taken from ec2 history):
+cd /usr/local/bin
+sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+Wow, major version change and differences CMD but essentially the same.
+I will do this one:
+cd /usr/local/bin
+sudo curl -SL https://github.com/docker/compose/releases/download/v2.14.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+----------------------------------------------------------
+/usr/local/bin/ starts out empty on this VM, which is nice!
+
+[ec2-user ~]$ ls -alt /usr/local/bin
+total 0
+drwxr-xr-x 12 root root 131 Nov 12 01:06 ..
+drwxr-xr-x  2 root root   6 Apr  9  2019 .
+
+------------------------------------------
+
+
+[ec2-user ~]$ cd /usr/local/bin
+[ec2-user bin]$ ls -alt
+total 0
+drwxr-xr-x 12 root root 131 Nov 12 01:06 ..
+drwxr-xr-x  2 root root   6 Apr  9  2019 .
+[ec2-user bin]$ sudo curl -SL https://github.com/docker/compose/releases/download/v2.14.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100 42.8M  100 42.8M    0     0  46.9M      0 --:--:-- --:--:-- --:--:-- 72.6M
+[ec2-user bin]$ docker-compose
+-bash: /usr/local/bin/docker-compose: Permission denied
+
+
+-----------------------------------------------------
+
+So we need some perms changed.
+
+* * * * * * SET DOCKER-COMPOSE BINARY PERMISSIONS
+
+We are in /usr/local/bin
+
+[ec2-user bin]$ sudo chmod 755 docker-compose
+
+And the command help now works for the ec2-user without sudo, so I think we are good.
+
+
+===================================================================================
+
+* NOTE: It seems we don't need to use sudo when running the site.
+I think we can just do docker-compose up as ec2-user. I don't know of any difference
+aside from security differences. But this test using sudo also works:
+[ec2-user bin]$ sudo /usr/local/bin/docker-compose version
+Docker Compose version v2.14.2
+
+====================================================================================
+====================================================================================
+
+* * * * * * DOCKER VOLUME SETUP * * * * * *
+
+Create the directories for dbvolume and datavolume
+mkdir /data/datavolume
+mkdir /data/dbvolume
+
+These paths will only be mapped to in the production docker-compose.production.yaml
+which lives on the EC2 instance.
+
+TODO: See if any perms need to be changed.
+
+====================================================================================
+====================================================================================
+
+

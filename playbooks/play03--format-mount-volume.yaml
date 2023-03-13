@@ -1,5 +1,5 @@
 ---
-# play03--mount-vol-to-ec2.yaml
+# play03--format-mount-volume.yaml
 
 # The EC2 instance and the attached volume must already exist and the EC2 must be a valid
 # managed node which has the Ansible public key authorized. This playbook to mount the
@@ -9,12 +9,12 @@
 # must have already authorized the local public ssh key on that new host, then we can run this
 # playbook, using the standard ssh connection method to automate against it. THE MANUAL
 # STEPS WHICH WORK FOR MOUNTING THE NEW PERSISTENT VOLUME ARE DETAILED IN THE FILE:
-# /playbooks/todo--play03--mount-vol-to-ec2.txt
+# /playbooks/todo--play03--format-mount-volume.txt
 
 
 - name: Play03 - AWS CLI - Format and Mount the attached persistent volume of a new EC2 instance
 #  vars:
-#    format_mount_vol_host: fresh-new-inst-AA
+#    format_mount_vol_host: new-instance-a
   hosts: "{{ format_mount_vol_host }}"
   tasks:
     ####
