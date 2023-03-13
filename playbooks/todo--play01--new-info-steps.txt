@@ -1,0 +1,20 @@
+
+TODO: Add service status:
+
+[ec2-user ~]$ service --status-all
+● cfn-hup.service - SYSV: Runs user-specified actions when a
+   Loaded: loaded (/etc/rc.d/init.d/cfn-hup; bad; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: man:systemd-sysv-generator(8)
+netconsole module not loaded
+Configured devices:
+lo eth0
+Currently active devices:
+lo eth0 docker0 br-1c697d00bf7a vethd5f62f4@if19 veth8bbfc12@if21
+[ec2-user ~]$
+
+TODO: Possibly re-order some of the info commands and group better.
+
+TODO: Make a shorter info playbook for more frequent monitoring. Then make one that packages a data summary for
+  even more frequent and formal monitoring, possibly for special use cases like performance/load testing.
+
