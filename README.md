@@ -1,11 +1,11 @@
 # AnsibleMyEC2
 
 
-### Automate your EC2 instances with clean/simple Ansible:
+### Automate your EC2 instances with clean/simple Ansible.
 
-### Create, Setup, Deploy, Operate: Containerized Full Stack Apps.
+### Create, setup, deploy and operate containerized full stack apps.
 
-### Perfect for teams to run a dev environment for containerized apps.
+### Perfect for teams to run a dev environment or EC2 production VMs.
 
 ### Academically straightforwad implementation of Ansible - Great for learning!
 
@@ -25,7 +25,9 @@ I'll keep this project simple. I have another project for a containerized Ansibl
 
 ----
 
-## Pyenv
+## Project Setup and Dependency Installation
+
+### Pyenv, Pyenv Virtualenv, Python and Required Modules
 
 I enthusiastically promote the use of Pyenv for complete, flawless management of multiple Python versions and your perfectly-version-matched Python Virtual Environments.
 
@@ -57,7 +59,6 @@ Create the virtual environment with the required name. This name will match the 
     pyenv virtualenv 3.11.2 ve.ansimy
 
 ----
-TODO: Write these instructions properly. For now, here is the quick summary:
 
 Now at this point your Pyenv Virtual Environment will be automatically activated any time your shell session or the executing context is "inside" the project, anywhere underneath the parent .python-version file. See how that works? Absolutely elegant, isn't it. Pyenv is so great. (This is not a paid endorsement lol! It is open source!)
 
@@ -79,7 +80,7 @@ You just type "pip" and you get the right Pip!
 ----
 
 
-## Configuring Authentication for SSH and AWS CLI
+## Authentication Configuration for SSH and AWS CLI
 
 
 ### How to configure the all-important ssh  key
@@ -116,7 +117,7 @@ additional manual steps. This is the simplest scenario to enable authentication 
 ----
 
 
-### Alternate Key Strategy - Locally-Generated, Manually-Installed Public Key (.pub file)
+### B. Alternate Key Strategy - Locally-Generated, Manually-Installed Public Key (.pub file)
 
 The below path for 'private_key_file' shows an example placeholder key, illustrating how to use the secrets
 directory in this project. The /secrets/ directory will prevent all contents from being added to a git repository,
@@ -156,5 +157,4 @@ All that is required for AnsibleMyEC2 to use your local AWS CLI is that you your
 that is has been congiured as such and is working to connect to and authenticate with your AWS account.
 
 ----
-
 
