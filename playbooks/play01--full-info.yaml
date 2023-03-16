@@ -1,8 +1,7 @@
 ---
 # play01--full-info.yaml
 
--
-  name: Play01 - EC2 fresh instance - Gather Information Before Setup
+- name: Play01 - EC2 fresh instance - Gather Information Before Setup
 #  vars:
 #    hosts: groupmain
   # Usage: Pass a valid host or a group on the command line via the argument 'hosts'.

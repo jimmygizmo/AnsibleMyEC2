@@ -18,3 +18,24 @@ TODO: Possibly re-order some of the info commands and group better.
 TODO: Make a shorter info playbook for more frequent monitoring. Then make one that packages a data summary for
   even more frequent and formal monitoring, possibly for special use cases like performance/load testing.
 
+----------------------------------------------
+
+CLARIFY: Why did I not see this in the above command?
+
+[ec2-user ~]$ service snmpd status
+Redirecting to /bin/systemctl status snmpd.service
+● snmpd.service - Simple Network Management Protocol (SNMP) Daemon.
+   Loaded: loaded (/usr/lib/systemd/system/snmpd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+[ec2-user ~]$
+
+OK .. it seems these systemctl redirects don't happen for --status-all
+
+[ec2-user ~]$ systemctl status snmpd
+● snmpd.service - Simple Network Management Protocol (SNMP) Daemon.
+   Loaded: loaded (/usr/lib/systemd/system/snmpd.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+[ec2-user ~]$
+
+TODO: ADD NEW INFO STEPS FOR BOTH OF THE ABOVE .. (make the second one the equivalent for ALL services .. systemctl)
+

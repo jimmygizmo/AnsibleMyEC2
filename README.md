@@ -5,9 +5,13 @@
 
 ### Create, setup, deploy and operate containerized full stack apps.
 
-### Perfect for teams to run a dev environment or EC2 production VMs.
+### Create, setup, deploy and operate containerized full stack apps.
 
-### Academically straightforwad implementation of Ansible - Great for learning!
+#### *NEW: Network Device Automation (will soon be moved into a new project):*
+
+AnsibleMyEC2 will stay simple and focused on EC2. The new  playbooks I am adding for automating Networking  devices will be moved to a new project after I use that work to further improve AnsibleMyEC2 and leverage and develop the design patterns here, to benefit both projects.
+
+Goals for the new Network Device Automation playbooks: Manage firewall rules for rapid/frequent response to threat activity. Control Load Balancer configuration for blue/green software deployment. Enable general automation of Cisco IOS devices and those of the most popular vendors. The name and scope of the resulting project is still being planned.
 
 ----
 

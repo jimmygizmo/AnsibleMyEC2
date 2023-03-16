@@ -1,0 +1,43 @@
+
+PHASE 1: Identify all dangling/orphaned security groups. Documented here.
+PHASE 2: remove those which have been identified. * Those steps don't exist here yet but should be simple.
+
+Excellent series of commands works great on macOS aws cli AND Amazon Linux aws cli and these are very different
+versions. Outstanding consistency which makes this playbook recipe even more valuable.
+
+Dangling security groups are not a huge problem, but if you get a lot of them accumulating after creating and
+terminating a lot of instances, you can have a bit of a mess and the AWS Console does not make it easy to discover
+which security groups are not attached to an EC2 instance.
+The playbook planned here in this todo is sort of a necessity in that respect, for anyone creating and terminating
+a lot of EC2 instances, since the security groupes seem to linger on as orphans as a rule.
+
+** Final confirmation. All dangling security groups identified by this process were verified to in fact be
+  dangling/orphaned and these were successfully deleted, proving this is a good playbook recipe. 100% validated
+  on both OS environments which I might run such automation from.
+
+
+macOS:
+➜  ~ aws --version
+aws-cli/2.9.10 Python/3.9.11 Darwin/21.6.0 exe/x86_64 prompt/off
+
+EC2 Amazon Linux:
+[ec2-user@ip-172-31-14-4 ~]$ aws --version
+aws-cli/1.18.147 Python/2.7.18 Linux/5.10.147-133.644.amzn2.x86_64 botocore/1.18.6
+
+GREAT RESULTS! These very different AWS CLI version and rather complex UNIX/Linux command strings ALL WORK GREAT!
+That says something about the people building and maintaining these great operating systems and shells.
+
+1.
+Full list of sec groups: macOS tests good: Amazon Linux tests good:
+aws ec2 describe-security-groups --query 'SecurityGroups[*].GroupId'  --output text | tr '\t' '\n'
+
+
+2.
+get all security groups tied to an instance, then piped to sort then uniq: macOS tests good: Amazon Linux tests good:
+aws ec2 describe-instances --query 'Reservations[*].Instances[*].SecurityGroups[*].GroupId' --output text | tr '\t' '\n' | sort | uniq
+
+
+3.
+compare the 2 lists and see what's not being used: macOS tests good: Amazon Linux tests good:
+comm -23  <(aws ec2 describe-security-groups --query 'SecurityGroups[*].GroupId'  --output text | tr '\t' '\n'| sort) <(aws ec2 describe-instances --query 'Reservations[*].Instances[*].SecurityGroups[*].GroupId' --output text | tr '\t' '\n' | sort | uniq)
+
