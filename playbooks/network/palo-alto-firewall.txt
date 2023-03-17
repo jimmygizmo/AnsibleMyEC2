@@ -1,5 +1,10 @@
 https://www.rogerperkin.co.uk/network-automation/ansible/palo-alto-ansible/
 
+DOCS ON THE COLLECTION:
+https://ansible-pan.readthedocs.io/en/latest/
+
+----------------------------------------------------------------------
+
 * This might be the best network simulator to use:
 EVE - The Emulated Virtual Environment For Network, Security and DevOps Professionals
 https://www.eve-ng.net/
@@ -20,4 +25,11 @@ device automation targets against which to develop playbooks etc.
 ansible-galaxy collection install paloaltonetworks.panos
 
 
+-----------------------------------------------------------------------
+
+Panorama is a centralized management system that provides global visibility and control over
+multiple Palo Alto Networks next generation firewalls through an easy to use web-based interface.
+** Panorama settings are made immediately after DNS, which are some of the first settings to put in place.
+
+---------------------------------------------------------------------
 
