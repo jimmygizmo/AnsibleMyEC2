@@ -1,0 +1,5 @@
+This video shows some interesting steps for OS upgrade scenarios.
+Just generally an interesting video for linux ansible automation.
+
+https://www.youtube.com/watch?v=7al0yehXa_g
+
