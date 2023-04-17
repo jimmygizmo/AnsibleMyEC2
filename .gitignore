@@ -14,7 +14,11 @@ inventory.yaml
 secrets/*
 !secrets/.gitkeep
 
-.idea
+# Intellij IDE settings dir:
+.idea/
+
+# Working files:
+todo/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

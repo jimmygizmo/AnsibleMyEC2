@@ -1,0 +1,88 @@
+---
+# play52--new-ec2-medium.yaml
+
+# This playbook requires that the AWS CLI is installed and configured with working authorization for the desired
+# AWS Account on 'localhost'. The playbook acts locally on the AWS CLI, thus using the AWS CLI to trigger AWS API
+# actions like creating EC2 instances, etc.
+
+- name: Play02 - AWS CLI - Create new EC2 t2.medium instance with persistent EBS volume attached (* but not mounted)
+  vars:
+#    new_instance_name: YOUR-DEFAULT-NEW-INSTANCE-NAME--OPTIONAL
+#    new_instance_subnet_id: YOUR-DEFAULT-SUBNET-ID--OPTIONAL
+#    new_instance_key_name: YOUR-DEFAULT-KEY-NAME--OPTIONAL
+    new_instance_ami_image: ami-02d5619017b3e5162
+  hosts: localhost
+  tasks:
+    ########
+    - name: Block01 - AWS Info
+      block:
+        - name: B01T01 - Get info on all running instances
+          community.aws.ec2_instance_info:
+          register: out_ec2_instance_list
+        - name: B01T01-out
+          debug:
+            var: out_ec2_instance_list
+    ########
+    - name: Block02 - Create New EC2 Instance - t2.medium
+      block:
+        - name: B02T01 - Create the new EC2 instance -------- NEW t2.medium  (with persistent ebs vol)
+          amazon.aws.ec2_instance:
+            name: "{{ new_instance_name }}"
+            vpc_subnet_id: "{{ new_instance_subnet_id }}"
+            instance_type: t2.medium
+            key_name: "{{ new_instance_key_name }}"
+            image_id: "{{ new_instance_ami_image }}"
+            metadata_options:
+              http_endpoint: enabled
+            volumes:
+              - device_name: /dev/sdb
+                ebs:
+                  volume_size: 12
+                  delete_on_termination: false
+          register: out_ec2_new_instance
+        - name: B02T01-out
+          debug:
+            var: out_ec2_new_instance
+    ####
+        - name: B02T02 - set_fact - Obtain instance id just created via -- out_ec2_new_instance.instances[0].instance_id
+          ansible.builtin.set_fact:
+            new_ec2_instance_id: "{{ out_ec2_new_instance.instances[0].instance_id }}"
+        - debug:
+            msg: "* * * * * * * * set_fact: new_ec2_instance_id - NEW EC2 INSTANCE ID: {{ new_ec2_instance_id }}"
+    ####
+        # Because the volume is still in the process of attaching, we need to pause and then query for fresh instance
+        # info, which is why we just obtained the instance id. Then we can parse out the volume serial number,
+        # which might help us mount the attached persistent volume. # TODO: Update here when solution is complete.
+        - name: B02T03 - Sleep for 10 seconds to let the new volume attach, then continue with play
+          ansible.builtin.wait_for:
+            timeout: 10
+          delegate_to: localhost
+    ####
+        - name: B02T04 - set_fact - Query the info for the instance id of the new instance
+          amazon.aws.ec2_instance_info:
+            instance_ids:
+              - "{{ new_ec2_instance_id }}"
+          register: out_queried_new_instance
+        - debug:
+            msg: "NEW EC2 INSTANCE QUERIED INFO: {{ out_queried_new_instance }}"
+    ####
+        - name: B02T05 - set_fact - Obtain volume id from the queried info (* modded = remove the dash)
+          # The dash in the volume id is removed using replace() because then it will match a pattern that has been
+          # used in AMI images as the volume serial number, which can be helpful for mounting this volume.
+          ansible.builtin.set_fact:
+            new_ec2_volume_id_modded: "{{ out_queried_new_instance.instances[0].block_device_mappings[1].ebs.volume_id | replace('-', '') }}"
+          #register: new_ec2_volume_id_modded
+        - debug:
+            msg: "* * * * * * * * set_fact: new_ec2_volume_id_modded - NEW EC2 VOLUME ID (modded): {{ new_ec2_volume_id_modded }}"
+
+...
+
+# Fresh, basic image. Not the new kind for 2023. Apr-15-2023. Newest of the same kind I have used before:
+# Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+# ami-02d5619017b3e5162
+
+# OLD: Amazon Linux Image used in this Playbook: ami-0b029b1931b347543**OLD-see-above
+
+
+# https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_instance_module.html
+

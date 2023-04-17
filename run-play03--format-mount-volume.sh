@@ -24,5 +24,5 @@ ansible-playbook -i inventory.yaml playbooks/play03--format-mount-volume.yaml \
 # the formatting process. This is coming soon. Ansible playbooks should have such safety checks in place at multiple
 # levels and should be organized and designed to allow the correct sequence and context of usage. Automation must
 # reduce the amount of manual work and never unintentionally create extra work because of misapplication of that
-# automation. We need smart automation, so adding such checks is a priority for the all of my Anisble work.
+# automation. We need smart automation, so adding such checks is a priority for all of my Anisble work.
 
